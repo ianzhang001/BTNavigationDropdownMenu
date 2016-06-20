@@ -90,7 +90,7 @@ public class BTNavigationDropdownMenu: UIView {
     }
     
     // The alignment of the text inside cell. Default is .Left
-    public var cellTextLabelAlignment: NSTextAlignment! {
+    @objc public var cellTextLabelAlignment: NSTextAlignment {
         get {
             return self.configuration.cellTextLabelAlignment
         }
