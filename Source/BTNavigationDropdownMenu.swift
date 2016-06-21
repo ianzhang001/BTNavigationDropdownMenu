@@ -511,7 +511,11 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return self.configuration.cellHeight
+        if indexPath.row == selectedIndexPath {
+            return 0
+        } else {
+            return self.configuration.cellHeight
+        }
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
