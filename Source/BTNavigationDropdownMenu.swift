@@ -471,7 +471,7 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     
     // Private properties
     private var items: [AnyObject]!
-    private var selectedIndexPath: Int!
+    private var selectedIndexPath: Int = 0
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -481,7 +481,7 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         super.init(frame: frame, style: UITableViewStyle.Plain)
         
         self.items = items
-        self.selectedIndexPath = (items as! [String]).indexOf(title)
+        self.selectedIndexPath = (items as! [String]).indexOf(title)!
         self.configuration = configuration
         
         // Setup table view
