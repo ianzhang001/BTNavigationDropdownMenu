@@ -260,10 +260,12 @@ public class BTNavigationDropdownMenu: UIView {
         self.tableView = BTTableView(frame: CGRectMake(menuWrapperBounds.origin.x, menuWrapperBounds.origin.y + 0.5, menuWrapperBounds.width, menuWrapperBounds.height + 300), items: items, title: title, configuration: self.configuration)
         
         self.tableView.selectRowAtIndexPathHandler = { [weak self] (indexPath: Int) -> () in
-            self?.didSelectItemAtIndexHandler!(indexPath: indexPath)
             self?.setMenuTitle("\(items[indexPath])")
             self?.hideMenu()
             self?.layoutSubviews()
+            dispatch_async(dispatch_get_main_queue()) {
+                self?.didSelectItemAtIndexHandler!(indexPath: indexPath)
+            }
         }
         
         // Add background view & table view to container view
@@ -520,12 +522,12 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        var cellHeight = self.configuration.cellHeight
         if indexPath.row == selectedIndexPath {
-            self.configuration.cellHeight = 0
-        } else {
-            self.configuration.cellHeight = 44
+            cellHeight = 0
         }
-        let cell = BTTableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "Cell", configuration: self.configuration)
+        
+        let cell = BTTableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "Cell", configuration: self.configuration, cellHeight: cellHeight)
         cell.textLabel?.text = self.items[indexPath.row] as? String
         //cell.checkmarkIcon.hidden = (indexPath.row == selectedIndexPath) ? false : true
         if self.configuration.keepSelectedCellColor == true {
@@ -560,14 +562,14 @@ class BTTableViewCell: UITableViewCell {
     var cellContentFrame: CGRect!
     var configuration: BTConfiguration!
     
-    init(style: UITableViewCellStyle, reuseIdentifier: String?, configuration: BTConfiguration) {
+    init(style: UITableViewCellStyle, reuseIdentifier: String?, configuration: BTConfiguration, cellHeight: CGFloat) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         self.configuration = configuration
         self.contentView.clipsToBounds = true
         
         // Setup cell
-        cellContentFrame = CGRectMake(0, 0, (UIApplication.sharedApplication().keyWindow?.frame.width)!, self.configuration.cellHeight)
+        cellContentFrame = CGRectMake(0, 0, (UIApplication.sharedApplication().keyWindow?.frame.width)!, cellHeight)
         self.contentView.backgroundColor = self.configuration.cellBackgroundColor
         self.selectionStyle = UITableViewCellSelectionStyle.None
         self.textLabel!.textColor = self.configuration.cellTextLabelColor
