@@ -341,7 +341,7 @@ public class BTNavigationDropdownMenu: UIView {
         self.backgroundView.alpha = 0
         
         // Animation
-        self.tableView.frame.origin.y = -CGFloat(self.items.count) * self.configuration.cellHeight - 300
+        self.tableView.frame.origin.y = -CGFloat(self.items.count - 1) * self.configuration.cellHeight - 300
         
         // Reload data to dismiss highlight color of selected cell
         self.tableView.reloadData()
@@ -387,10 +387,10 @@ public class BTNavigationDropdownMenu: UIView {
             delay: 0,
             options: UIViewAnimationOptions.TransitionNone,
             animations: {
-                self.tableView.frame.origin.y = -CGFloat(self.items.count) * self.configuration.cellHeight - 300
+                self.tableView.frame.origin.y = -CGFloat(self.items.count - 1) * self.configuration.cellHeight - 300
                 self.backgroundView.alpha = 0
             }, completion: { _ in
-                if self.isShown == false && self.tableView.frame.origin.y == -CGFloat(self.items.count) * self.configuration.cellHeight - 300 {
+                if self.isShown == false && self.tableView.frame.origin.y == -CGFloat(self.items.count - 1) * self.configuration.cellHeight - 300 {
                     self.menuWrapper.hidden = true
                 }
         })
@@ -483,6 +483,7 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         self.items = items
         self.selectedIndexPath = (items as! [String]).indexOf(title)!
         self.configuration = configuration
+        self.clipsToBounds = true
         
         // Setup table view
         self.delegate = self
@@ -519,9 +520,14 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        if indexPath.row == selectedIndexPath {
+            self.configuration.cellHeight = 0
+        } else {
+            self.configuration.cellHeight = 44
+        }
         let cell = BTTableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "Cell", configuration: self.configuration)
         cell.textLabel?.text = self.items[indexPath.row] as? String
-        cell.checkmarkIcon.hidden = (indexPath.row == selectedIndexPath) ? false : true
+        //cell.checkmarkIcon.hidden = (indexPath.row == selectedIndexPath) ? false : true
         if self.configuration.keepSelectedCellColor == true {
             cell.contentView.backgroundColor = (indexPath.row == selectedIndexPath) ? self.configuration.cellSelectionColor : self.configuration.cellBackgroundColor
         }
@@ -534,14 +540,14 @@ class BTTableView: UITableView, UITableViewDelegate, UITableViewDataSource {
         selectedIndexPath = indexPath.row
         self.selectRowAtIndexPathHandler!(indexPath: indexPath.row)
         self.reloadData()
-        let cell = tableView.cellForRowAtIndexPath(indexPath) as? BTTableViewCell
-        cell?.contentView.backgroundColor = self.configuration.cellSelectionColor
+//        let cell = tableView.cellForRowAtIndexPath(indexPath) as? BTTableViewCell
+//        cell?.contentView.backgroundColor = self.configuration.cellSelectionColor
     }
     
     func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
-        let cell = tableView.cellForRowAtIndexPath(indexPath) as? BTTableViewCell
-        cell?.checkmarkIcon.hidden = true
-        cell?.contentView.backgroundColor = self.configuration.cellBackgroundColor
+//        let cell = tableView.cellForRowAtIndexPath(indexPath) as? BTTableViewCell
+//        cell?.checkmarkIcon.hidden = true
+//        cell?.contentView.backgroundColor = self.configuration.cellBackgroundColor
     }
 }
 
@@ -576,17 +582,17 @@ class BTTableViewCell: UITableViewCell {
         }
         
         // Checkmark icon
-        if self.textLabel!.textAlignment == .Center {
-            self.checkmarkIcon = UIImageView(frame: CGRectMake(cellContentFrame.width - checkmarkIconWidth, (cellContentFrame.height - 30)/2, 30, 30))
-        } else if self.textLabel!.textAlignment == .Left {
-            self.checkmarkIcon = UIImageView(frame: CGRectMake(cellContentFrame.width - checkmarkIconWidth, (cellContentFrame.height - 30)/2, 30, 30))
-        } else {
-            self.checkmarkIcon = UIImageView(frame: CGRectMake(horizontalMargin, (cellContentFrame.height - 30)/2, 30, 30))
-        }
-        self.checkmarkIcon.hidden = true
-        self.checkmarkIcon.image = self.configuration.checkMarkImage
-        self.checkmarkIcon.contentMode = UIViewContentMode.ScaleAspectFill
-        self.contentView.addSubview(self.checkmarkIcon)
+//        if self.textLabel!.textAlignment == .Center {
+//            self.checkmarkIcon = UIImageView(frame: CGRectMake(cellContentFrame.width - checkmarkIconWidth, (cellContentFrame.height - 30)/2, 30, 30))
+//        } else if self.textLabel!.textAlignment == .Left {
+//            self.checkmarkIcon = UIImageView(frame: CGRectMake(cellContentFrame.width - checkmarkIconWidth, (cellContentFrame.height - 30)/2, 30, 30))
+//        } else {
+//            self.checkmarkIcon = UIImageView(frame: CGRectMake(horizontalMargin, (cellContentFrame.height - 30)/2, 30, 30))
+//        }
+//        self.checkmarkIcon.hidden = true
+//        self.checkmarkIcon.image = self.configuration.checkMarkImage
+//        self.checkmarkIcon.contentMode = UIViewContentMode.ScaleAspectFill
+//        self.contentView.addSubview(self.checkmarkIcon)
         
         // Separator for cell
         let separator = BTTableCellContentView(frame: cellContentFrame)
@@ -624,6 +630,7 @@ class BTTableCellContentView: UIView {
     
     func initialize() {
         self.backgroundColor = UIColor.clearColor()
+        self.clipsToBounds = true
     }
     
     override func drawRect(rect: CGRect) {
@@ -632,7 +639,7 @@ class BTTableCellContentView: UIView {
         
         // Set separator color of dropdown menu based on barStyle
         CGContextSetStrokeColorWithColor(context, self.separatorColor.CGColor)
-        CGContextSetLineWidth(context, 1)
+        CGContextSetLineWidth(context, 0.5)
         CGContextMoveToPoint(context, 0, self.bounds.size.height)
         CGContextAddLineToPoint(context, self.bounds.size.width, self.bounds.size.height)
         CGContextStrokePath(context)
