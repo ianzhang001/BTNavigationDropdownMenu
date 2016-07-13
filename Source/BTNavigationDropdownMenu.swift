@@ -567,6 +567,7 @@ class BTTableViewCell: UITableViewCell {
         
         self.configuration = configuration
         self.contentView.clipsToBounds = true
+        self.clipsToBounds = true
         
         // Setup cell
         cellContentFrame = CGRectMake(0, 0, (UIApplication.sharedApplication().keyWindow?.frame.width)!, cellHeight)
